@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetroBoy Emulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0f380f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+        }
+        
+        #emulator-container {
+            position: relative;
+            width: 100%;
+            max-width: 320px;
+            aspect-ratio: 160/144;
+        }
+        
+        #screen {
+            width: 100%;
+            height: 100%;
+            background: #9bbc0f;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            border: 4px solid #1a1a1a;
+        }
+        
+        #boot_screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #9bbc0f;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #0f380f;
+        }
+        
+        .nintendo-logo {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            animation: bounce 0.5s ease infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .loading-bar {
+            width: 80%;
+            height: 8px;
+            background: #0f380f;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .loading-progress {
+            height: 100%;
+            background: #0f380f;
+            width: 0%;
+            transition: width 0.1s;
+        }
+        
+        .game-title {
+            position: absolute;
+            bottom: 20px;
+            font-size: 10px;
+            text-align: center;
+            width: 100%;
+        }
+        
+        #title_screen {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #0f380f;
+            text-align: center;
+        }
+        
+        .pixel-art {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .press-start {
+            font-size: 12px;
+            animation: blink 1s step-end infinite;
+        }
+        
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="emulator_container">
+        <canvas id="screen" width="160" height="144"></canvas>
+        
+        <div id="boot_screen">
+            <div class="nintendo-logo">■ Nintendo®</div>
+            <div class="loading-bar">
+                <div class="loading-progress" id="progress"></div>
+            </div>
+            <div class="game-title" id="game_title_display">Loading...</div>
+        </div>
+        
+        <div id="title_screen">
+            <div class="pixel-art">🎮</div>
+            <div class="press-start">PRESS START</div>
+        </div>
+        
+        <div class="scanlines"></div>
+    </div>
+    
+    <script>
+        // Emulator state
+        const state = {
+            gameLoaded: false,
+            gameTitle: '',
+            romData: null,
+            screen: null,
+            ctx: null
+        };
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            state.screen = document.getElementById('screen');
+            state.ctx = state.screen.getContext('2d');
+            
+            // Clear screen with Game Boy green
+            state.ctx.fillStyle = '#9bbc0f';
+            state.ctx.fillRect(0, 0, 160, 144);
+            
+            // Run boot sequence
+            runBootSequence();
+        });
+        
+        // Boot sequence animation
+        function runBootSequence() {
+            const bootScreen = document.getElementById('boot_screen');
+            const titleScreen = document.getElementById('title_screen');
+            const progress = document.getElementById('progress');
+            const gameTitleDisplay = document.getElementById('game_title_display');
+            
+            let progressWidth = 0;
+            const interval = setInterval(() => {
+                progressWidth += 5;
+                progress.style.width = progressWidth + '%';
+                
+                if (progressWidth >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        bootScreen.style.display = 'none';
+                        titleScreen.style.display = 'flex';
+                        state.gameLoaded = true;
+                        
+                        // Notify Android
+                        if (window.androidInterface) {
+                            window.androidInterface.onGameLoaded();
+                        }
+                    }, 500);
+                }
+            }, 100);
+        }
+        
+        // Input handler - called from Android
+        window.emulatorInput = function(input, pressed) {
+            console.log('Input:', input, pressed);
+            
+            // Handle START button on title screen
+            if (input === 'start' && pressed) {
+                const titleScreen = document.getElementById('title_screen');
+                const pressStart = titleScreen.querySelector('.press-start');
+                if (pressStart) {
+                    pressStart.textContent = 'GAME STARTED!';
+                    pressStart.style.animation = 'none';
+                }
+                
+                // Draw game screen simulation
+                drawGameScreen();
+            }
+            
+            // Notify Android of input
+            if (window.androidInterface) {
+                window.androidInterface.handleInput(input, pressed);
+            }
+        };
+        
+        // Draw a simulated game screen
+        function drawGameScreen() {
+            const ctx = state.ctx;
+            
+            // Clear with green
+            ctx.fillStyle = '#9bbc0f';
+            ctx.fillRect(0, 0, 160, 144);
+            
+            // Draw some pixel art blocks
+            ctx.fillStyle = '#0f380f';
+            
+            // Draw ground
+            ctx.fillRect(0, 120, 160, 24);
+            
+            // Draw some platforms
+            ctx.fillRect(20, 80, 40, 8);
+            ctx.fillRect(80, 60, 40, 8);
+            ctx.fillRect(30, 40, 30, 8);
+            
+            // Draw a character (simple square)
+            ctx.fillStyle = '#306230';
+            ctx.fillRect(50, 100, 16, 16);
+            
+            // Draw eyes
+            ctx.fillStyle = '#0f380f';
+            ctx.fillRect(58, 104, 4, 4);
+            ctx.fillRect(62, 104, 4, 4);
+        }
+        
+        // Set game title (called from Android)
+        window.setGameTitle = function(title) {
+            state.gameTitle = title;
+            document.getElementById('game_title_display').textContent = title;
+        };
+        
+        // Load ROM data (placeholder)
+        window.loadRom = function(romData) {
+            state.romData = romData;
+            console.log('ROM loaded:', romData ? romData.length : 0, 'bytes');
+        };
+        
+        // Get screen data for screenshot
+        window.getScreenData = function() {
+            return state.screen.toDataURL('image/png');
+        };
+        
+        // Emulator info
+        window.getEmulatorInfo = function() {
+            return {
+                name: 'RetroBoy',
+                version: '1.0',
+                screen: { width: 160, height: 144 },
+                colors: {
+                    darkest: '#0f380f',
+                    dark: '#306230',
+                    light: '#8bac0f',
+                    lightest: '#9bbc0f'
+                }
+            };
+        };
+    </script>
+</body>
+</html>

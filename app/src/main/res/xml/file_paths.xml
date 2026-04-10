@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-files-path
+        name="roms"
+        path="ROMs/" />
+    <external-files-path
+        name="saves"
+        path="Saves/" />
+    <cache-path
+        name="cache"
+        path="/" />
+</paths>

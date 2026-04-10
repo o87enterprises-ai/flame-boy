@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_dark"
+    android:keepScreenOn="true"
+    tools:context=".EmulatorActivity">
+
+    <!-- Top Bar -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/bg_gray"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            android:src="@drawable/ic_back"
+            app:tint="@color/text_primary" />
+
+        <TextView
+            android:id="@+id/gameTitleText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingHorizontal="16dp"
+            android:text="Game Title"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/saveStateButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Save State"
+            android:src="@drawable/ic_save"
+            app:tint="@color/text_primary" />
+
+        <ImageButton
+            android:id="@+id/menuButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Menu"
+            android:src="@drawable/ic_menu"
+            app:tint="@color/text_primary" />
+    </LinearLayout>
+
+    <!-- Game Screen Container -->
+    <FrameLayout
+        android:id="@+id/screenContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="16dp"
+        android:background="@color/gb_dark_green"
+        app:layout_constraintDimensionRatio="160:144"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintWidth_percent="0.85">
+
+        <!-- WebView for Emulation -->
+        <WebView
+            android:id="@+id/emulatorWebView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
+
+        <!-- Loading Overlay -->
+        <LinearLayout
+            android:id="@+id/loadingOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/gb_dark_green"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:indeterminateTint="@color/gb_light_green" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Loading..."
+                android:textColor="@color/gb_light_green"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Controls Container -->
+    <LinearLayout
+        android:id="@+id/controlsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/screenContainer">
+
+        <!-- D-Pad Section -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <GridLayout
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_gravity="center"
+                android:columnCount="3"
+                android:rowCount="3">
+
+                <!-- Up -->
+                <Button
+                    android:id="@+id/btnUp"
+                    style="@style/DPadButton"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_row="0"
+                    android:layout_column="1"
+                    android:layout_margin="4dp"
+                    android:text="▲" />
+
+                <!-- Left -->
+                <Button
+                    android:id="@+id/btnLeft"
+                    style="@style/DPadButton"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_row="1"
+                    android:layout_column="0"
+                    android:layout_margin="4dp"
+                    android:text="◀" />
+
+                <!-- Center (decorative) -->
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_row="1"
+                    android:layout_column="1"
+                    android:layout_margin="4dp"
+                    android:background="@color/btn_gray" />
+
+                <!-- Right -->
+                <Button
+                    android:id="@+id/btnRight"
+                    style="@style/DPadButton"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_row="1"
+                    android:layout_column="2"
+                    android:layout_margin="4dp"
+                    android:text="▶" />
+
+                <!-- Down -->
+                <Button
+                    android:id="@+id/btnDown"
+                    style="@style/DPadButton"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_row="2"
+                    android:layout_column="1"
+                    android:layout_margin="4dp"
+                    android:text="▼" />
+            </GridLayout>
+        </FrameLayout>
+
+        <!-- Action Buttons Section -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
+
+                <!-- A Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnA"
+                    style="@style/ActionButton"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="24dp"
+                    android:backgroundTint="@color/btn_a_red"
+                    android:text="A"
+                    android:textSize="24sp" />
+
+                <!-- B Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnB"
+                    style="@style/ActionButton"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_marginEnd="24dp"
+                    android:layout_toStartOf="@id/btnA"
+                    android:backgroundTint="@color/btn_b_red"
+                    android:text="B"
+                    android:textSize="24sp" />
+
+                <!-- Start Button -->
+                <Button
+                    android:id="@+id/btnStart"
+                    style="@style/DPadButton"
+                    android:layout_width="64dp"
+                    android:layout_height="32dp"
+                    android:layout_below="@id/btnB"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="24dp"
+                    android:backgroundTint="@color/btn_gray"
+                    android:text="@string/btn_start"
+                    android:textSize="12sp" />
+
+                <!-- Select Button -->
+                <Button
+                    android:id="@+id/btnSelect"
+                    style="@style/DPadButton"
+                    android:layout_width="64dp"
+                    android:layout_height="32dp"
+                    android:layout_below="@id/btnStart"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="8dp"
+                    android:backgroundTint="@color/btn_gray"
+                    android:text="@string/btn_select"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- Toast Message -->
+    <TextView
+        android:id="@+id/toastText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/bg_gray"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp"
+        android:textColor="@color/text_primary"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/controlsContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

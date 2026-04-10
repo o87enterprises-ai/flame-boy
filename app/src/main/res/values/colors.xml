@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Game Boy Classic Colors -->
+    <color name="gb_dark_green">#0f380f</color>
+    <color name="gb_medium_dark">#306230</color>
+    <color name="gb_medium_light">#8bac0f</color>
+    <color name="gb_light_green">#9bbc0f</color>
+    
+    <!-- UI Colors -->
+    <color name="color_primary">#4a7c23</color>
+    <color name="color_primary_dark">#3d661d</color>
+    <color name="color_accent">#8bac0f</color>
+    
+    <!-- Button Colors -->
+    <color name="btn_a_red">#d32f2f</color>
+    <color name="btn_b_red">#b71c1c</color>
+    <color name="btn_gray">#424242</color>
+    <color name="btn_pressed">#616161</color>
+    
+    <!-- Background Colors -->
+    <color name="bg_dark">#1a1a1a</color>
+    <color name="bg_gray">#2d2d2d</color>
+    <color name="bg_green">#1e3a1e</color>
+    
+    <!-- Text Colors -->
+    <color name="text_primary">#ffffff</color>
+    <color name="text_secondary">#b0b0b0</color>
+    <color name="text_green">#9bbc0f</color>
+</resources>
